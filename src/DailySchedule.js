@@ -4,29 +4,47 @@ import { CheckIcon, TrashIcon } from '@heroicons/react/24/solid';
 function DailySchedule() {
   // Estado inicial desde localStorage o array vacío
   const [tasks, setTasks] = useState(() => {
-    // Obtener la fecha actual en formato YYYY-MM-DD
+    return loadTasks();
+  });
+
+  // Función para cargar tareas verificando la fecha
+  function loadTasks() {
     const today = new Date().toISOString().split('T')[0];
+    const savedData = localStorage.getItem('daily-tasks');
     
-    // Intentar obtener las tareas del día actual
-    const savedTasks = localStorage.getItem('daily-tasks');
-    if (savedTasks) {
-      const { date, tasks: storedTasks } = JSON.parse(savedTasks);
-      // Si las tareas son del día actual, usarlas; si no, empezar con array vacío
+    if (savedData) {
+      const { date, tasks: storedTasks } = JSON.parse(savedData);
+      // Si las tareas son de un día diferente, retornar array vacío
       return date === today ? storedTasks : [];
     }
     return [];
-  });
+  }
 
-  // Efecto para guardar en localStorage y limpiar tareas viejas
+  // Efecto para guardar en localStorage
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
-    
-    // Guardar las tareas actuales con la fecha
     localStorage.setItem('daily-tasks', JSON.stringify({
       date: today,
       tasks: tasks
     }));
   }, [tasks]);
+
+  // Efecto para verificar cambio de día
+  useEffect(() => {
+    // Función para verificar la fecha
+    const checkDate = () => {
+      const currentTasks = loadTasks();
+      setTasks(currentTasks);
+    };
+
+    // Verificar cada minuto si cambió el día
+    const interval = setInterval(() => {
+      checkDate();
+    }, 60000); // Verificar cada minuto
+
+    // Limpiar el intervalo cuando el componente se desmonte
+    return () => clearInterval(interval);
+  }, []);
 
   // Generar slots de tiempo para las 24 horas
   const timeSlots = Array.from({ length: 24 }, (_, i) => {
@@ -64,6 +82,9 @@ function DailySchedule() {
   return (
     <div className="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6">
       <h1 className="text-2xl font-bold mb-4">Mi Agenda del Día</h1>
+      <div className="text-sm text-gray-500 mb-4">
+        {new Date().toLocaleDateString()}
+      </div>
       
       <div className="space-y-2">
         {timeSlots.map((time) => {
