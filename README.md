@@ -1,6 +1,6 @@
 # Daily Schedule App
 
-Esta es una aplicación de agenda diaria desarrollada con React y diseñada con TailwindCSS. La aplicación fue creada con la asistencia de Claude (Anthropic).
+Esta es una aplicación de agenda diaria desarrollada con React y diseñada con TailwindCSS. La aplicación fue creada para uso personal con la asistencia de Claude (Anthropic).
 
 ## Características
 
